@@ -5,20 +5,31 @@ import StartApp as StartApp
 import Effects exposing (Effects, Never)
 import Maybe exposing (map)
 
-app = StartApp.start { init = (model, Effects.none), view = view, update = update, inputs = [] }
+app = StartApp.start { init = (emptyModel, Effects.none), view = view, update = update, inputs = [] }
 main = app.html
-type alias Set = { lift: String, reps: Int, weight: Float}
-model: List Set
-model = [{lift = "Squat", reps = 5, weight = 50}, {lift = "Bench", reps = 5, weight = 50}]
-update a m = (m, a)
+type alias Set = { id: Int,  lift: String, reps: Int, weight: Float}
 
+emptySet = { id = 0, lift = "", reps = 0, weight = 0 }
+emptyModel = { lifts = [], newSet = emptySet }
+
+type Action = Insert Set
+
+update action model = 
+  case action of 
+    Insert set -> ({model | lifts = ([set] ++ model.lifts)}, Effects.none)
+  
 liftTemplate: Set -> List Html.Html
 liftTemplate set = 
-  [ text set.lift, 
+  [  
     div [] [ 
-      label [] [ text "Reps", input [value (toString set.reps)] [] ], 
-      label [] [ text "Weight", input [value (toString set.weight)] [] ] 
+      label [] [ text "Lift: ", input [value set.lift ] [] ], 
+      label [] [ text "Reps: ", input [value (toString set.reps)] [] ], 
+      label [] [ text "Weight: ", input [value (toString set.weight)] [] ] 
     ]
   ]
-view x model = 
-  div [] (List.concatMap liftTemplate model)
+newSetTemplate address = 
+    button [onClick address (Insert emptySet)] [ text "+" ] 
+  
+
+view address model = 
+  div [] ([newSetTemplate address] ++ (List.concatMap liftTemplate model.lifts))
