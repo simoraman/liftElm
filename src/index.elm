@@ -1,4 +1,4 @@
-import Html exposing (div, button, text, input, label)
+import Html exposing (h1, img, div, button, text, input, label)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import StartApp as StartApp
@@ -32,4 +32,10 @@ newSetTemplate address =
   
 
 view address model = 
-  div [] ([newSetTemplate address] ++ (List.concatMap liftTemplate model.lifts))
+  div [] ([
+    h1[] [
+      img [src "asset/bicep.png", align "middle"] [], 
+      text "liftElm", 
+      img [src "asset/bicep2.png", align "middle"] []]]
+    ++ [newSetTemplate address] 
+    ++ (List.concatMap liftTemplate model.lifts))
