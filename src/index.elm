@@ -68,9 +68,12 @@ liftTemplate address set =
       label [] [ text "Weight: ", input [value (toString set.weight), on "input" targetValue (\str -> Signal.message address (toFloatAction (UpdateWeight set.id) str))] [] ] 
     ]
   ]
-newSetTemplate address model = 
-    button [onClick address (Insert (emptySet model.nextId))] [ text "+" ] 
   
+newSetTemplate address model = 
+  let 
+    lastEntry = (model.lifts |> List.head |> Maybe.withDefault (emptySet 0))
+  in
+    button [onClick address (Insert { lastEntry | id = model.nextId})] [ text "+" ] 
 
 view address model = 
   div [] ([
