@@ -75,14 +75,20 @@ toFloatAction action str =
          
 liftTemplate: Signal.Address Action -> Set -> List Html.Html
 liftTemplate address set = 
-  [  
-    div [] [
-      text (toString set.id), 
-      label [] [ text "Lift: ", input [value set.lift, on "input" targetValue (\str -> Signal.message address (UpdateLift set.id str))] [] ], 
-      label [] [ text "Reps: ", input [value (toString set.reps), on "input" targetValue (\str -> Signal.message address (toIntAction (UpdateReps set.id) str))] [] ], 
-      label [] [ text "Weight: ", input [value (toString set.weight), on "input" targetValue (\str -> Signal.message address (toFloatAction (UpdateWeight set.id) str))] [] ] 
-    ]
-  ]
+  [ div [] 
+    [ text (toString set.id)
+    , label [] 
+        [ text "Lift: "
+        , input [value set.lift
+        , on "input" targetValue (\str -> Signal.message address (UpdateLift set.id str))] [] ]
+    , label [] 
+        [ text "Reps: "
+        , input [value (toString set.reps)
+        , on "input" targetValue (\str -> Signal.message address (toIntAction (UpdateReps set.id) str))] [] ]
+    , label [] 
+      [ text "Weight: "
+      , input [value (toString set.weight)
+      , on "input" targetValue (\str -> Signal.message address (toFloatAction (UpdateWeight set.id) str))] [] ]]]
   
 newSetTemplate address model = 
   let 
@@ -90,11 +96,14 @@ newSetTemplate address model =
   in
     button [onClick address (Insert { lastEntry | id = model.nextId})] [ text "+" ] 
 
+siteTitle = 
+  [ h1[] 
+    [ img [src "asset/bicep.png", align "middle"] []
+    , text "liftElm"
+    , img [src "asset/bicep2.png", align "middle"] []]]
+      
 view address model = 
-  div [] ([
-    h1[] [
-      img [src "asset/bicep.png", align "middle"] [], 
-      text "liftElm", 
-      img [src "asset/bicep2.png", align "middle"] []]]
+  div [] 
+    ( siteTitle 
     ++ [newSetTemplate address model] 
     ++ (List.concatMap (liftTemplate address) model.lifts))
