@@ -7,13 +7,28 @@ import Maybe exposing (map)
 import String exposing (..)
 
 app = StartApp.start { init = (emptyModel, Effects.none), view = view, update = update, inputs = [] }
+
 main = app.html
-type alias Set = { id: Int, lift: String, reps: Int, weight: Float}
 
-emptySet id = { id = id, lift = "", reps = 0, weight = 0 }
-emptyModel = { lifts = [], newSet = (emptySet 0), nextId = 1 }
+type alias Set = 
+  { id: Int
+  , lift: String
+  , reps: Int
+  , weight: Float}
 
-type Action = NoOp 
+emptySet id = 
+  { id = id
+  , lift = ""
+  , reps = 0
+  , weight = 0 }
+
+emptyModel = 
+  { lifts = []
+  , newSet = (emptySet 0)
+  , nextId = 1 }
+
+type Action 
+  = NoOp 
   | Insert Set 
   | UpdateLift Int String
   | UpdateWeight Int Float
