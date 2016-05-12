@@ -9,6 +9,7 @@ defmodule Server do
     ]
 
     opts = [strategy: :one_for_one, name: Server.Supervisor]
+    MongoPool.start_link(database: "test")
     Supervisor.start_link(children, opts)
   end
 

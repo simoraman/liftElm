@@ -10,7 +10,8 @@ defmodule Server.Router do
 
   post "/api/workout" do
     {:ok, data, _} = Plug.Conn.read_body(conn)
-    lifts = Poison.decode!(data, as: %{"lifts" => [Domain.LiftSet]})
-    send_resp(conn, 201, "lulz")
+    lifts = Poison.decode!(data, as: %{"sets" => [LiftSet]})["sets"]
+    WorkoutService.insert(lifts)
+    send_resp(conn, 201, "Created!")
   end
 end
