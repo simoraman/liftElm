@@ -14,4 +14,11 @@ defmodule Server.Router do
     WorkoutService.insert(lifts)
     send_resp(conn, 201, "Created!")
   end
+
+  get "/api/workout" do
+    workouts = WorkoutService.get()
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Poison.encode!(workouts))
+  end
 end
