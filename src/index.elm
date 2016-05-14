@@ -1,3 +1,4 @@
+module LiftApp exposing (..)
 import Platform.Cmd as Cmd exposing (Cmd)
 import Html.App as Html
 import Html exposing (h1, img, div, button, text, input, label)
