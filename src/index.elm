@@ -1,14 +1,14 @@
+import Platform.Cmd as Cmd exposing (Cmd)
+import Html.App as Html
 import Html exposing (h1, img, div, button, text, input, label)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, on, targetValue)
-import StartApp as StartApp
-import Effects exposing (Effects, Never)
-import Maybe exposing (map)
+import Html.Events exposing (onClick, on, targetValue, onInput)
 import String exposing (..)
 
-app = StartApp.start { init = (emptyModel, Effects.none), view = view, update = update, inputs = [] }
-
-main = app.html
+main = Html.program { init = (emptyModel, Cmd.none)
+                    , update = update
+                    , view = view
+                    , subscriptions = \_ -> Sub.none }
 
 type alias Set = 
   { id: Int
@@ -27,7 +27,7 @@ emptyModel =
   , newSet = (emptySet 0)
   , nextId = 1 }
 
-type Action 
+type Msg 
   = NoOp 
   | Insert Set 
   | UpdateLift Int String
@@ -55,13 +55,13 @@ updateLiftReps model id reps =
   in
     { model | lifts = updatedLifts } 
     
-update action model = 
-  case action of 
-    Insert set -> ({model | lifts = ([set] ++ model.lifts), nextId = model.nextId + 1}, Effects.none)
-    UpdateLift id str -> (updateLiftName model id str, Effects.none)
-    UpdateWeight id weight -> (updateLiftWeight model id weight, Effects.none)
-    UpdateReps id reps -> (updateLiftReps model id reps, Effects.none)
-    _ -> (model, Effects.none)
+update msg model = 
+  case msg of 
+    Insert set -> ({model | lifts = ([set] ++ model.lifts), nextId = model.nextId + 1}, Cmd.none)
+    UpdateLift id str -> (updateLiftName model id str, Cmd.none)
+    UpdateWeight id weight -> (updateLiftWeight model id weight, Cmd.none)
+    UpdateReps id reps -> (updateLiftReps model id reps, Cmd.none)
+    _ -> (model, Cmd.none)
     
 toIntAction action str =
   case String.toInt str of 
@@ -73,28 +73,28 @@ toFloatAction action str =
     Result.Ok i -> action i
     _ -> NoOp
          
-liftTemplate: Signal.Address Action -> Set -> List Html.Html
-liftTemplate address set = 
+liftTemplate set = 
   [ div [] 
     [ text (toString set.id)
     , label [] 
         [ text "Lift: "
         , input [value set.lift
-        , on "input" targetValue (\str -> Signal.message address (UpdateLift set.id str))] [] ]
+        , onInput (\str -> UpdateLift set.id str)] [] ]
     , label [] 
         [ text "Reps: "
         , input [value (toString set.reps)
-        , on "input" targetValue (\str -> Signal.message address (toIntAction (UpdateReps set.id) str))] [] ]
+        , onInput (\str -> toIntAction (UpdateReps set.id) str)] [] ]
     , label [] 
       [ text "Weight: "
       , input [value (toString set.weight)
-      , on "input" targetValue (\str -> Signal.message address (toFloatAction (UpdateWeight set.id) str))] [] ]]]
+      , onInput (\str -> toFloatAction (UpdateWeight set.id) str)] [] ]
+    ]]
   
-newSetTemplate address model = 
+newSetTemplate model = 
   let 
     lastEntry = (model.lifts |> List.head |> Maybe.withDefault (emptySet 0))
   in
-    button [onClick address (Insert { lastEntry | id = model.nextId})] [ text "+" ] 
+    button [onClick (Insert { lastEntry | id = model.nextId})] [ text "+" ] 
 
 siteTitle = 
   [ h1[] 
@@ -102,8 +102,8 @@ siteTitle =
     , text "liftElm"
     , img [src "asset/bicep2.png", align "middle"] []]]
       
-view address model = 
+view model = 
   div [] 
     ( siteTitle 
-    ++ [newSetTemplate address model] 
-    ++ (List.concatMap (liftTemplate address) model.lifts))
+    ++ [newSetTemplate model] 
+    ++ (List.concatMap (liftTemplate) model.lifts))
